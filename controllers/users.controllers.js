@@ -8,19 +8,20 @@ module.exports.getAllUser = (req, res, next) => {
 };
 
 module.exports.getRandomUser = (req, res, next) => {
-    console.log(usersInfo);
     const randomUser = userData[Math.floor(Math.random() * userData.length)];
-    console.log(randomUser);
     res.send(randomUser);
 };
 module.exports.saveAUser = (req, res, next) => {
     const body = req.body;
-    const filterId = usersInfo.find((user) => user.id === body.id);
+    const filterId = userData.find((user) => user.id === body.id);
     if (filterId) {
         res.send({ message : "id already in server"})
         return
     } else {
-        usersInfo.push(body);
+        userData.push(body);
+        fs.writeFileSync("userInfo.json", JSON.stringify(userData), (err) => {
+            if (err) throw err;
+        });
     }
-    res.json(usersInfo);
+    res.send(userData);
 };

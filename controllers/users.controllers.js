@@ -11,6 +11,7 @@ module.exports.getRandomUser = (req, res, next) => {
     const randomUser = userData[Math.floor(Math.random() * userData.length)];
     res.send(randomUser);
 };
+
 module.exports.saveAUser = (req, res, next) => {
     const body = req.body;
     const filterId = userData.find((user) => user.id === body.id);
@@ -24,4 +25,28 @@ module.exports.saveAUser = (req, res, next) => {
         });
     }
     res.send(userData);
+};
+module.exports.updateAUser = (req, res, next) => {
+    const id = req.params.id
+    const body = req.body
+    const filter = userData.find((user) => user.id === id);
+    if (!filter){
+        res.send({message: 'User id not found'})
+        return;
+    } else {
+        let updateData = userData.find((user) => user.id === filter.id);
+        filter.id = id;
+        filter.name = body.name || filter.name;
+        filter.gender = body.gender || filter.gender;
+        filter.address = body.address || filter.address;
+        filter.contact = body.contact || filter.contact;
+        filter.photoUrl = body.photoUrl || filter.photoUrl;
+        updateData = filter,
+        userData,
+        fs.writeFileSync("userInfo.json", JSON.stringify(userData), (err) => {
+            if (err) throw err;
+        });
+        res.send(updateData);
+    }
+    
 };

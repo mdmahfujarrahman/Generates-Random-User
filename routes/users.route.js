@@ -18,3 +18,4 @@ router.route("/bulk-update").patch(userControlled.updateBulkUser);
 router.route("/delete/:id").delete(userControlled.deleteUser);
 
 module.exports = router;
+

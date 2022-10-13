@@ -3,7 +3,6 @@ const app = express();
 const cors = require('cors');
 const PORT = process.env.PORT || 5000;
 const userRoutes = require("./routes/users.route.js");
-const fs = require('fs');
 
 
 app.use(express.json());

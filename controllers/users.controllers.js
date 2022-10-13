@@ -8,7 +8,6 @@ module.exports.getAllUser = (req, res, next) => {
 };
 
 
-
 module.exports.getRandomUser = (req, res, next) => {
     const randomUser = userData[Math.floor(Math.random() * userData.length)];
     res.send(randomUser);
@@ -16,17 +15,30 @@ module.exports.getRandomUser = (req, res, next) => {
 
 module.exports.saveAUser = (req, res, next) => {
     const body = req.body;
-    const filterId = userData.find((user) => user.id === body.id);
-    if (filterId) {
-        res.send({ message : "id already in server"})
+    const filter = userData.find((user) => user.contact === body.contact);
+    if (filter) {
+        res.send({
+            message: `User ${filter.contact} already exists`,
+            status: "Fail",
+        });
         return
     } else {
-        userData.push(body);
+        let id = userData.at(-1).id;
+        let newId = parseInt(id) + 1; 
+        const newData = {
+            id: newId.toString(),
+            name: body.name,
+            gender: body.gender,
+            contact: body.contact,
+            address: body.address,
+            photoUrl: body.photoUrl,
+        };
+        userData.push(newData)
         fs.writeFileSync("userInfo.json", JSON.stringify(userData), (err) => {
             if (err) throw err;
         });
     }
-    res.send({ updateData, status: "success" });
+    res.send({ userData, status: "success" });
 };
 
 
@@ -57,32 +69,21 @@ module.exports.updateAUser = (req, res, next) => {
 
 
 module.exports.updateBulkUser = (req, res, next) => {
-    const body = req.body
-    let updateData = userData.map((item, index) => { 
-        body.map((user) => {
-            if (item.id === user.id) {
-                item.id = user.id;
-                item.name = user.name || item.name;
-                item.gender = user.gender || item.gender;
-                item.address = user.address || item.address;
-                item.contact = user.contact || item.contact;
-                item.photoUrl = user.photoUrl || item.photoUrl;
-                
+    const body = req.body;
+    const updateData = Object.create(null);
+    for (const user of body) {
+            const index = userData.findIndex(item => item.id === user.id);
+            if (index === -1) {
+                return res.send({message: "User Not Found"})
             } else {
-                res.send({ message: "User id not found", status: "Fail" });
-                return;
+                updateData[index] = { ...userData[index], ...user }
             }
-        })
-       return item; 
-    });
-    userData = updateData
+    }
+    Object.assign(userData, updateData);
     fs.writeFileSync("userInfo.json", JSON.stringify(userData), (err) => {
             if (err) throw err;
-        });
-    res.send({ updateData, status: "success" });
-        
-
-    res.send(body);
+    });
+    return res.send({ updateData });
 };
 
 
@@ -90,10 +91,10 @@ module.exports.deleteUser = (req, res, next) => {
     const id = req.params.id;
     const filter = userData.find((user) => user.id === id);
     if (!filter) {
-        res.send({ message: "User id not found", status: "Fail" });
-        return;
+        return res.send({ message: "User id not found", status: "Fail" });
+        
     } else {
-        const getIndex = userData.filter((user) => user.id !== filter.id);
+    const getIndex = userData.filter((user) => user.id !== filter.id);
        fs.writeFileSync("userInfo.json", JSON.stringify(getIndex), (err) => {
            if (err) throw err;
        });

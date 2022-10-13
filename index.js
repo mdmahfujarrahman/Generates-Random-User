@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 const userRoutes = require("./routes/users.route.js");
 const fs = require('fs');
 
@@ -15,10 +15,10 @@ app.use("/user", userRoutes);
 
 
 app.get('/', (req, res) => {
-    res.send("Welcome to assainment 1")
+    res.send("Welcome to Assignment One");
 })
 
 
-app.listen(port, ()=> {
-    console.log("Server running on port " + port);
+app.listen(PORT, () => {
+    console.log(`Server listening on ${PORT}`);
 });
